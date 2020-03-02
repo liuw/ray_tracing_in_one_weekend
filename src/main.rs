@@ -1,6 +1,8 @@
 mod vec3;
+mod ray;
 
 use vec3::*;
+use ray::*;
 
 fn main() {
     let nx = 200;
