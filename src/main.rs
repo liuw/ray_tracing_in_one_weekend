@@ -1,3 +1,5 @@
+mod vec3;
+
 fn main() {
     let nx = 200;
     let ny = 100;
