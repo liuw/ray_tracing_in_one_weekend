@@ -70,6 +70,9 @@ fn main() {
                 col += color(&r, &world);
             }
             col /= ns as f32;
+            // Gamma correction
+            col = Vec3::new(col.x().sqrt(),col.y().sqrt(),col.z().sqrt());
+
 
             let ir = (255.99 * col.r()) as i32;
             let ig = (255.99 * col.g()) as i32;
