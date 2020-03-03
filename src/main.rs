@@ -32,9 +32,9 @@ fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
 }
 
 fn main() {
-    let nx = 400;
-    let ny = 200;
-    let ns = 200;
+    let nx = 800;
+    let ny = 400;
+    let ns = 100;
 
     println!("P3");
     println!("{} {}", nx, ny);
