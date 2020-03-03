@@ -31,7 +31,7 @@ fn random_in_unit_sphere() -> Vec3 {
 fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
     let mut rec = HitRecord { t: 0.0, p: Vec3::new(0.0,0.0,0.0), normal: Vec3::new(0.0,0.0,0.0)};
 
-    if hit(world, r, 0.0, std::f32::MAX, &mut rec) {
+    if hit(world, r, 0.001, std::f32::MAX, &mut rec) {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return 0.5*color(&Ray::new(&rec.p, &(target-rec.p)), &world);
     } else {
