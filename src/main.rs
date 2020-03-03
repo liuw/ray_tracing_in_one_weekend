@@ -1,3 +1,5 @@
+extern crate rand;
+
 mod vec3;
 mod ray;
 mod hittable;
@@ -7,6 +9,8 @@ use vec3::*;
 use ray::*;
 use hittable::*;
 use sphere::*;
+
+use rand::Rng;
 
 fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
     let mut rec = HitRecord { t: 0.0, p: Vec3::new(0.0,0.0,0.0), normal: Vec3::new(0.0,0.0,0.0)};
