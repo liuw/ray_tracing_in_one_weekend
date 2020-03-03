@@ -2,8 +2,8 @@ use crate::vec3::*;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Ray {
-    a: Vec3,
-    b: Vec3,
+    pub a: Vec3,
+    pub b: Vec3,
 }
 
 impl Ray {

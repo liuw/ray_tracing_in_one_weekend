@@ -4,13 +4,20 @@ mod vec3;
 mod ray;
 mod hittable;
 mod sphere;
+mod camera;
 
 use vec3::*;
 use ray::*;
 use hittable::*;
 use sphere::*;
+use camera::*;
 
 use rand::Rng;
+
+fn random() -> f32 {
+    let r: f32 = rand::thread_rng().gen();
+    r
+}
 
 fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
     let mut rec = HitRecord { t: 0.0, p: Vec3::new(0.0,0.0,0.0), normal: Vec3::new(0.0,0.0,0.0)};
@@ -25,17 +32,13 @@ fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
 }
 
 fn main() {
-    let nx = 800;
-    let ny = 400;
+    let nx = 400;
+    let ny = 200;
+    let ns = 200;
 
     println!("P3");
     println!("{} {}", nx, ny);
     println!("255");
-
-    let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-    let horizontal = Vec3::new(4.0, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, 2.0, 0.0);
-    let origin = Vec3::new(0.0, 0.0, 0.0);
 
     let s1 = Sphere::new(&Vec3::new(0.0,0.0,-1.0), 0.5);
     let s2 = Sphere::new(&Vec3::new(0.0,-100.5,-1.0), 100.0);
@@ -44,14 +47,19 @@ fn main() {
         Box::new(&s2 as &dyn Hittable),
     ];
 
+    let cam = Camera::new();
+
     for j in (0..ny).rev() {
         for i in 0..nx {
-            let u = i as f32 / nx as f32;
-            let v = j as f32 / ny as f32;
-            let r = Ray::new(&origin, &(lower_left_corner + u * horizontal + v * vertical));
+            let mut col = Vec3::new(0.0,0.0,0.0);
 
-            let p = r.point_at_parameter(2.0);
-            let col = color(&r, &world);
+            for s in 0..ns {
+                let u = (i as f32 + random()) / nx as f32;
+                let v = (j as f32 + random()) / ny as f32;
+                let r = cam.get_ray(u, v);
+                col += color(&r, &world);
+            }
+            col /= ns as f32;
 
             let ir = (255.99 * col.r()) as i32;
             let ig = (255.99 * col.g()) as i32;
