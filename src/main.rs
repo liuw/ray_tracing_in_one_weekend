@@ -19,11 +19,21 @@ fn random() -> f32 {
     r
 }
 
+fn random_in_unit_sphere() -> Vec3 {
+    loop {
+        let p = 2.0 * Vec3::new(random(), random(), random()) - Vec3::new(1.0,1.0,1.0);
+        if p.squared_length() < 1.0 {
+            return p;
+        }
+    }
+}
+
 fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
     let mut rec = HitRecord { t: 0.0, p: Vec3::new(0.0,0.0,0.0), normal: Vec3::new(0.0,0.0,0.0)};
 
     if hit(world, r, 0.0, std::f32::MAX, &mut rec) {
-        return 0.5*Vec3::new(rec.normal.x()+1.0, rec.normal.y()+1.0, rec.normal.z()+1.0)
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5*color(&Ray::new(&rec.p, &(target-rec.p)), &world);
     } else {
         let unit_direction = Vec3::unit_vector(r.direction());
         let t = 0.5 * (unit_direction.y() + 1.0);
