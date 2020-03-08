@@ -93,11 +93,16 @@ fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
 #[derive(Clone)]
 struct Metal {
     albedo: Vec3,
+    fuzz: f32,
 }
 
 impl Metal {
-    fn new(v: Vec3) -> Metal {
-        Metal { albedo: v }
+    fn new(v: Vec3, f: f32) -> Metal {
+        let fuzz = if f < 1.0 { f } else { 1.0 };
+        Metal {
+            albedo: v,
+            fuzz: fuzz,
+        }
     }
 }
 
@@ -110,7 +115,7 @@ impl Material for Metal {
         scattered: &mut Ray,
     ) -> bool {
         let reflected = reflect(&Vec3::unit_vector(r_in.direction()), &rec.normal);
-        *scattered = Ray::new(&rec.p, &reflected);
+        *scattered = Ray::new(&rec.p, &(reflected + self.fuzz * random_in_unit_sphere()));
         *attenuation = self.albedo;
 
         Vec3::dot(&scattered.direction(), &rec.normal) > 0.0
@@ -139,12 +144,12 @@ fn main() {
     let s3 = Sphere::new(
         &Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2)))),
+        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3))),
     );
     let s4 = Sphere::new(
         &Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Some(Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8)))),
+        Some(Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 1.0))),
     );
 
     let world = vec![
