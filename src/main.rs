@@ -211,22 +211,38 @@ fn main() {
     println!("{} {}", nx, ny);
     println!("255");
 
-    let r = (f32::consts::PI / 4.0).cos();
-
     let s1 = Sphere::new(
-        &Vec3::new(-r, 0.0, -1.0),
-        r,
-        Some(Box::new(Lambertian::new(Vec3::new(0.0, 0.0, 1.0)))),
+        &Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Some(Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5)))),
     );
     let s2 = Sphere::new(
-        &Vec3::new(r, 0.0, -1.0),
-        r,
-        Some(Box::new(Lambertian::new(Vec3::new(1.0, 0.0, 0.0)))),
+        &Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Some(Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)))),
+    );
+    let s3 = Sphere::new(
+        &Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3))),
+    );
+    let s4 = Sphere::new(
+        &Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        Some(Box::new(Dielectric::new(1.5))),
+    );
+    let s5 = Sphere::new(
+        &Vec3::new(-1.0, 0.0, -1.0),
+        -0.45,
+        Some(Box::new(Dielectric::new(1.5))),
     );
 
     let world = vec![
         Box::new(&s1 as &dyn Hittable),
         Box::new(&s2 as &dyn Hittable),
+        Box::new(&s3 as &dyn Hittable),
+        Box::new(&s4 as &dyn Hittable),
+        Box::new(&s5 as &dyn Hittable),
     ];
 
     let cam = Camera::new(
