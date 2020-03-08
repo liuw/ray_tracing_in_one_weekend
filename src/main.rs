@@ -136,6 +136,13 @@ fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f32, refracted: &mut Vec3) -> bool {
     false
 }
 
+fn schlick(cosine: f32, ref_idx: f32) -> f32 {
+    let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+    r0 = r0 * r0;
+
+    r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
+}
+
 #[derive(Clone)]
 struct Dielectric {
     ref_idx: f32,
@@ -160,13 +167,17 @@ impl Material for Dielectric {
         *attenuation = Vec3::new(1.0, 1.0, 1.0);
         let ni_over_nt;
         let mut refracted = Vec3::new(0.0, 0.0, 0.0);
+        let cosine;
+        let reflect_prob;
 
         if Vec3::dot(&r_in.direction(), &rec.normal) > 0.0 {
             outward_normal = -1.0 * rec.normal;
             ni_over_nt = self.ref_idx;
+            cosine = Vec3::dot(&r_in.direction(), &rec.normal) / r_in.direction().length();
         } else {
             outward_normal = rec.normal;
             ni_over_nt = 1.0 / self.ref_idx;
+            cosine = -1.0 * Vec3::dot(&r_in.direction(), &rec.normal) / r_in.direction().length();
         }
 
         if refract(
@@ -175,10 +186,15 @@ impl Material for Dielectric {
             ni_over_nt,
             &mut refracted,
         ) {
-            *scattered = Ray::new(&rec.p, &refracted);
+            reflect_prob = schlick(cosine, self.ref_idx);
         } else {
+            reflect_prob = 1.0;
+        }
+
+        if random() < reflect_prob {
             *scattered = Ray::new(&rec.p, &reflected);
-            return false;
+        } else {
+            *scattered = Ray::new(&rec.p, &refracted);
         }
 
         true
@@ -207,11 +223,16 @@ fn main() {
     let s3 = Sphere::new(
         &Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.0))),
+        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3))),
     );
     let s4 = Sphere::new(
         &Vec3::new(-1.0, 0.0, -1.0),
         0.5,
+        Some(Box::new(Dielectric::new(1.5))),
+    );
+    let s5 = Sphere::new(
+        &Vec3::new(-1.0, 0.0, -1.0),
+        -0.45,
         Some(Box::new(Dielectric::new(1.5))),
     );
 
@@ -220,6 +241,7 @@ fn main() {
         Box::new(&s2 as &dyn Hittable),
         Box::new(&s3 as &dyn Hittable),
         Box::new(&s4 as &dyn Hittable),
+        Box::new(&s5 as &dyn Hittable),
     ];
 
     let cam = Camera::new();
