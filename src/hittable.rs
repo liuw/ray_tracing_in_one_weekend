@@ -1,30 +1,33 @@
+use crate::material::*;
 use crate::ray::*;
 use crate::vec3::*;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
-pub struct HitRecord {
+pub struct HitRecord<T: Material + Copy> {
     pub t: f32,
     pub p: Vec3,
     pub normal: Vec3,
+    pub material: Option<T>,
 }
 
-pub trait Hittable {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
+pub trait Hittable<T: Material + Copy> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &mut HitRecord<T>) -> bool {
         false
     }
 }
 
-pub fn hit(
-    list: &Vec<Box<&dyn Hittable>>,
+pub fn hit<T: Material + Copy>(
+    list: &Vec<Box<&dyn Hittable<T>>>,
     r: &Ray,
     t_min: f32,
     t_max: f32,
-    rec: &mut HitRecord,
+    rec: &mut HitRecord<T>,
 ) -> bool {
     let mut temp_rec = HitRecord {
         t: 0.0,
         p: Vec3::new(0.0, 0.0, 0.0),
         normal: Vec3::new(0.0, 0.0, 0.0),
+        material: None,
     };
     let mut hit_anything = false;
     let mut closest_so_far = t_max;

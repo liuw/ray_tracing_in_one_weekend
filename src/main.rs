@@ -2,12 +2,14 @@ extern crate rand;
 
 mod camera;
 mod hittable;
+mod material;
 mod ray;
 mod sphere;
 mod vec3;
 
 use camera::*;
 use hittable::*;
+use material::*;
 use ray::*;
 use sphere::*;
 use vec3::*;
@@ -28,11 +30,12 @@ fn random_in_unit_sphere() -> Vec3 {
     }
 }
 
-fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
+fn color<T: Material + Copy>(r: &Ray, world: &Vec<Box<&dyn Hittable<T>>>) -> Vec3 {
     let mut rec = HitRecord {
         t: 0.0,
         p: Vec3::new(0.0, 0.0, 0.0),
         normal: Vec3::new(0.0, 0.0, 0.0),
+        material: None,
     };
 
     if hit(world, r, 0.001, std::f32::MAX, &mut rec) {
@@ -45,6 +48,27 @@ fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
     }
 }
 
+#[derive(Copy, Debug, Clone)]
+pub struct Lambertian {
+    albedo: Vec3,
+}
+
+impl Material for Lambertian {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord<Self>,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        *scattered = Ray::new(&rec.p, &(target - rec.p));
+        *attenuation = self.albedo;
+
+        true
+    }
+}
+
 fn main() {
     let nx = 800;
     let ny = 400;
@@ -54,11 +78,11 @@ fn main() {
     println!("{} {}", nx, ny);
     println!("255");
 
-    let s1 = Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5);
-    let s2 = Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0);
+    let s1 = Sphere::<Lambertian>::new(&Vec3::new(0.0, 0.0, -1.0), 0.5);
+    let s2 = Sphere::<Lambertian>::new(&Vec3::new(0.0, -100.5, -1.0), 100.0);
     let world = vec![
-        Box::new(&s1 as &dyn Hittable),
-        Box::new(&s2 as &dyn Hittable),
+        Box::new(&s1 as &dyn Hittable<_>),
+        Box::new(&s2 as &dyn Hittable<_>),
     ];
 
     let cam = Camera::new();
