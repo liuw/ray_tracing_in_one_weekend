@@ -30,7 +30,7 @@ fn random_in_unit_sphere() -> Vec3 {
     }
 }
 
-fn color<T: Material + Copy>(r: &Ray, world: &Vec<Box<&dyn Hittable<T>>>) -> Vec3 {
+fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
     let mut rec = HitRecord {
         t: 0.0,
         p: Vec3::new(0.0, 0.0, 0.0),
@@ -57,7 +57,7 @@ impl Material for Lambertian {
     fn scatter(
         &self,
         r_in: &Ray,
-        rec: &HitRecord<Self>,
+        rec: &HitRecord,
         attenuation: &mut Vec3,
         scattered: &mut Ray,
     ) -> bool {
@@ -78,11 +78,11 @@ fn main() {
     println!("{} {}", nx, ny);
     println!("255");
 
-    let s1 = Sphere::<Lambertian>::new(&Vec3::new(0.0, 0.0, -1.0), 0.5);
-    let s2 = Sphere::<Lambertian>::new(&Vec3::new(0.0, -100.5, -1.0), 100.0);
+    let s1 = Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5);
+    let s2 = Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0);
     let world = vec![
-        Box::new(&s1 as &dyn Hittable<_>),
-        Box::new(&s2 as &dyn Hittable<_>),
+        Box::new(&s1 as &dyn Hittable),
+        Box::new(&s2 as &dyn Hittable),
     ];
 
     let cam = Camera::new();
