@@ -39,6 +39,9 @@ impl Hittable for Sphere {
 
 impl Sphere {
     pub fn new(c: &Vec3, r: f32) -> Sphere {
-        Sphere { center: *c, radius: r }
+        Sphere {
+            center: *c,
+            radius: r,
+        }
     }
 }

@@ -1,16 +1,16 @@
 extern crate rand;
 
-mod vec3;
-mod ray;
-mod hittable;
-mod sphere;
 mod camera;
+mod hittable;
+mod ray;
+mod sphere;
+mod vec3;
 
-use vec3::*;
-use ray::*;
-use hittable::*;
-use sphere::*;
 use camera::*;
+use hittable::*;
+use ray::*;
+use sphere::*;
+use vec3::*;
 
 use rand::Rng;
 
@@ -21,7 +21,7 @@ fn random() -> f32 {
 
 fn random_in_unit_sphere() -> Vec3 {
     loop {
-        let p = 2.0 * Vec3::new(random(), random(), random()) - Vec3::new(1.0,1.0,1.0);
+        let p = 2.0 * Vec3::new(random(), random(), random()) - Vec3::new(1.0, 1.0, 1.0);
         if p.squared_length() < 1.0 {
             return p;
         }
@@ -29,11 +29,15 @@ fn random_in_unit_sphere() -> Vec3 {
 }
 
 fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>) -> Vec3 {
-    let mut rec = HitRecord { t: 0.0, p: Vec3::new(0.0,0.0,0.0), normal: Vec3::new(0.0,0.0,0.0)};
+    let mut rec = HitRecord {
+        t: 0.0,
+        p: Vec3::new(0.0, 0.0, 0.0),
+        normal: Vec3::new(0.0, 0.0, 0.0),
+    };
 
     if hit(world, r, 0.001, std::f32::MAX, &mut rec) {
         let target = rec.p + rec.normal + random_in_unit_sphere();
-        return 0.5*color(&Ray::new(&rec.p, &(target-rec.p)), &world);
+        return 0.5 * color(&Ray::new(&rec.p, &(target - rec.p)), &world);
     } else {
         let unit_direction = Vec3::unit_vector(r.direction());
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -50,8 +54,8 @@ fn main() {
     println!("{} {}", nx, ny);
     println!("255");
 
-    let s1 = Sphere::new(&Vec3::new(0.0,0.0,-1.0), 0.5);
-    let s2 = Sphere::new(&Vec3::new(0.0,-100.5,-1.0), 100.0);
+    let s1 = Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5);
+    let s2 = Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0);
     let world = vec![
         Box::new(&s1 as &dyn Hittable),
         Box::new(&s2 as &dyn Hittable),
@@ -61,7 +65,7 @@ fn main() {
 
     for j in (0..ny).rev() {
         for i in 0..nx {
-            let mut col = Vec3::new(0.0,0.0,0.0);
+            let mut col = Vec3::new(0.0, 0.0, 0.0);
 
             for s in 0..ns {
                 let u = (i as f32 + random()) / nx as f32;
@@ -71,8 +75,7 @@ fn main() {
             }
             col /= ns as f32;
             // Gamma correction
-            col = Vec3::new(col.x().sqrt(),col.y().sqrt(),col.z().sqrt());
-
+            col = Vec3::new(col.x().sqrt(), col.y().sqrt(), col.z().sqrt());
 
             let ir = (255.99 * col.r()) as i32;
             let ig = (255.99 * col.g()) as i32;
