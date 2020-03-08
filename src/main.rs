@@ -122,6 +122,69 @@ impl Material for Metal {
     }
 }
 
+fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f32, refracted: &mut Vec3) -> bool {
+    let uv = Vec3::unit_vector(*v);
+    let dt = Vec3::dot(&uv, n);
+
+    let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
+
+    if discriminant > 0.0 {
+        *refracted = ni_over_nt * (uv - *n * dt) - *n * discriminant.sqrt();
+        return true;
+    }
+
+    false
+}
+
+#[derive(Clone)]
+struct Dielectric {
+    ref_idx: f32,
+}
+
+impl Dielectric {
+    fn new(r: f32) -> Dielectric {
+        Dielectric { ref_idx: r }
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(
+        &self,
+        r_in: &Ray,
+        rec: &HitRecord,
+        attenuation: &mut Vec3,
+        scattered: &mut Ray,
+    ) -> bool {
+        let outward_normal;
+        let reflected = reflect(&Vec3::unit_vector(r_in.direction()), &rec.normal);
+        *attenuation = Vec3::new(1.0, 1.0, 1.0);
+        let ni_over_nt;
+        let mut refracted = Vec3::new(0.0, 0.0, 0.0);
+
+        if Vec3::dot(&r_in.direction(), &rec.normal) > 0.0 {
+            outward_normal = -1.0 * rec.normal;
+            ni_over_nt = self.ref_idx;
+        } else {
+            outward_normal = rec.normal;
+            ni_over_nt = 1.0 / self.ref_idx;
+        }
+
+        if refract(
+            &r_in.direction(),
+            &outward_normal,
+            ni_over_nt,
+            &mut refracted,
+        ) {
+            *scattered = Ray::new(&rec.p, &refracted);
+        } else {
+            *scattered = Ray::new(&rec.p, &reflected);
+            return false;
+        }
+
+        true
+    }
+}
+
 fn main() {
     let nx = 800;
     let ny = 400;
@@ -134,7 +197,7 @@ fn main() {
     let s1 = Sphere::new(
         &Vec3::new(0.0, 0.0, -1.0),
         0.5,
-        Some(Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3)))),
+        Some(Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5)))),
     );
     let s2 = Sphere::new(
         &Vec3::new(0.0, -100.5, -1.0),
@@ -144,12 +207,12 @@ fn main() {
     let s3 = Sphere::new(
         &Vec3::new(1.0, 0.0, -1.0),
         0.5,
-        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3))),
+        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.0))),
     );
     let s4 = Sphere::new(
         &Vec3::new(-1.0, 0.0, -1.0),
         0.5,
-        Some(Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 1.0))),
+        Some(Box::new(Dielectric::new(1.5))),
     );
 
     let world = vec![
