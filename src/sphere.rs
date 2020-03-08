@@ -42,11 +42,11 @@ impl Hittable for Sphere {
 }
 
 impl Sphere {
-    pub fn new(c: &Vec3, r: f32) -> Sphere {
+    pub fn new(c: &Vec3, r: f32, m: Option<Box<dyn Material>>) -> Sphere {
         Sphere {
             center: *c,
             radius: r,
-            material: None,
+            material: m,
         }
     }
 }

@@ -78,8 +78,8 @@ fn main() {
     println!("{} {}", nx, ny);
     println!("255");
 
-    let s1 = Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5);
-    let s2 = Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0);
+    let s1 = Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5, None);
+    let s2 = Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0, None);
     let world = vec![
         Box::new(&s1 as &dyn Hittable),
         Box::new(&s2 as &dyn Hittable),
