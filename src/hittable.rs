@@ -17,7 +17,7 @@ pub trait Hittable {
 }
 
 pub fn hit(
-    list: &Vec<Box<&dyn Hittable>>,
+    list: &Vec<Box<dyn Hittable>>,
     r: &Ray,
     t_min: f32,
     t_max: f32,

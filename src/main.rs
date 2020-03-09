@@ -31,7 +31,7 @@ fn random_in_unit_sphere() -> Vec3 {
     }
 }
 
-fn color(r: &Ray, world: &Vec<Box<&dyn Hittable>>, depth: u32) -> Vec3 {
+fn color(r: &Ray, world: &Vec<Box<dyn Hittable>>, depth: u32) -> Vec3 {
     let mut rec = HitRecord {
         t: 0.0,
         p: Vec3::new(0.0, 0.0, 0.0),
@@ -202,6 +202,26 @@ impl Material for Dielectric {
     }
 }
 
+fn random_scene() -> Vec<Box<dyn Hittable>> {
+    let mut scene: Vec<Box<dyn Hittable>> = Vec::new();
+
+    let s1 = Box::new(Sphere::new(
+        &Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        Some(Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5)))),
+    ));
+    let s2 = Box::new(Sphere::new(
+        &Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        Some(Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)))),
+    ));
+
+    scene.push(s1);
+    scene.push(s2);
+
+    scene
+}
+
 fn main() {
     let nx = 800;
     let ny = 400;
@@ -211,39 +231,7 @@ fn main() {
     println!("{} {}", nx, ny);
     println!("255");
 
-    let s1 = Sphere::new(
-        &Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        Some(Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5)))),
-    );
-    let s2 = Sphere::new(
-        &Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        Some(Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)))),
-    );
-    let s3 = Sphere::new(
-        &Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        Some(Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3))),
-    );
-    let s4 = Sphere::new(
-        &Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        Some(Box::new(Dielectric::new(1.5))),
-    );
-    let s5 = Sphere::new(
-        &Vec3::new(-1.0, 0.0, -1.0),
-        -0.45,
-        Some(Box::new(Dielectric::new(1.5))),
-    );
-
-    let world = vec![
-        Box::new(&s1 as &dyn Hittable),
-        Box::new(&s2 as &dyn Hittable),
-        Box::new(&s3 as &dyn Hittable),
-        Box::new(&s4 as &dyn Hittable),
-        Box::new(&s5 as &dyn Hittable),
-    ];
+    let world = random_scene();
 
     let lookfrom = Vec3::new(3.0, 3.0, 2.0);
     let lookat = Vec3::new(0.0, 0.0, -1.0);
