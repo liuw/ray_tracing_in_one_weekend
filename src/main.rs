@@ -288,10 +288,10 @@ fn main() {
 
     let world = random_scene();
 
-    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
-    let lookat = Vec3::new(0.0, 0.0, -1.0);
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat = Vec3::new(0.0, 0.0, 0.0);
     let dist_to_focus = (lookfrom - lookat).length();
-    let aperture = 2.0;
+    let aperture = 0.1;
 
     let cam = Camera::new(
         &lookfrom,
