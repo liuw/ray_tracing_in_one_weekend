@@ -205,19 +205,74 @@ impl Material for Dielectric {
 fn random_scene() -> Vec<Box<dyn Hittable>> {
     let mut scene: Vec<Box<dyn Hittable>> = Vec::new();
 
-    let s1 = Box::new(Sphere::new(
-        &Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        Some(Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5)))),
-    ));
-    let s2 = Box::new(Sphere::new(
-        &Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        Some(Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)))),
-    ));
+    let s0 = Sphere::new(
+        &Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Some(Box::new(Lambertian::new(Vec3::new(0.5, 0.5, 0.5)))),
+    );
+    scene.push(Box::new(s0));
 
-    scene.push(s1);
-    scene.push(s2);
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = random();
+
+            let center = Vec3::new(a as f32 + 0.9 * random(), 0.2, b as f32 + 0.9 * random());
+
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    scene.push(Box::new(Sphere::new(
+                        &center,
+                        0.2,
+                        Some(Box::new(Lambertian::new(Vec3::new(
+                            random() * random(),
+                            random() * random(),
+                            random() * random(),
+                        )))),
+                    )));
+                } else if choose_mat < 0.95 {
+                    // metal
+                    scene.push(Box::new(Sphere::new(
+                        &center,
+                        0.2,
+                        Some(Box::new(Metal::new(
+                            Vec3::new(
+                                0.5 * (1.0 + random()),
+                                0.5 * (1.0 + random()),
+                                0.5 * (1.0 + random()),
+                            ),
+                            0.5 * random(),
+                        ))),
+                    )));
+                } else {
+                    // glass
+                    scene.push(Box::new(Sphere::new(
+                        &center,
+                        0.2,
+                        Some(Box::new(Dielectric::new(1.5))),
+                    )));
+                }
+            }
+        }
+    }
+
+    scene.push(Box::new(Sphere::new(
+        &Vec3::new(0.0, 1.0, 0.0),
+        1.0,
+        Some(Box::new(Dielectric::new(1.5))),
+    )));
+
+    scene.push(Box::new(Sphere::new(
+        &Vec3::new(-4.0, 1.0, 0.0),
+        1.0,
+        Some(Box::new(Lambertian::new(Vec3::new(0.4, 0.2, 0.1)))),
+    )));
+
+    scene.push(Box::new(Sphere::new(
+        &Vec3::new(4.0, 1.0, 0.0),
+        1.0,
+        Some(Box::new(Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0))),
+    )));
 
     scene
 }
