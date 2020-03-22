@@ -72,7 +72,7 @@ impl Lambertian {
 impl Material for Lambertian {
     fn scatter(
         &self,
-        r_in: &Ray,
+        _r_in: &Ray,
         rec: &HitRecord,
         attenuation: &mut Vec3,
         scattered: &mut Ray,
@@ -305,7 +305,7 @@ fn main() {
         for i in 0..nx {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
 
-            for s in 0..ns {
+            for _ in 0..ns {
                 let u = (i as f32 + random()) / nx as f32;
                 let v = (j as f32 + random()) / ny as f32;
                 let r = cam.get_ray(u, v);

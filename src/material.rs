@@ -5,16 +5,16 @@ use crate::vec3::*;
 pub trait Material: MaterialClone {
     fn scatter(
         &self,
-        r_in: &Ray,
-        rec: &HitRecord,
-        attenuation: &mut Vec3,
-        scattered: &mut Ray,
+        _r_in: &Ray,
+        _rec: &HitRecord,
+        _attenuation: &mut Vec3,
+        _scattered: &mut Ray,
     ) -> bool {
         false
     }
 }
 
-trait MaterialClone {
+pub trait MaterialClone {
     fn clone_box(&self) -> Box<dyn Material>;
 }
 
