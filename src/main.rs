@@ -1,5 +1,3 @@
-extern crate rand;
-
 mod camera;
 mod hittable;
 mod material;
