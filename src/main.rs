@@ -1,17 +1,9 @@
-mod camera;
-mod hittable;
-mod material;
-mod ray;
-mod sphere;
-mod vec3;
-
-use camera::*;
-use hittable::*;
-use material::*;
-use ray::*;
-use sphere::*;
-use std::f32;
-use vec3::*;
+use ray_tracing_in_one_weekend::camera::*;
+use ray_tracing_in_one_weekend::hittable::*;
+use ray_tracing_in_one_weekend::material::*;
+use ray_tracing_in_one_weekend::ray::*;
+use ray_tracing_in_one_weekend::sphere::*;
+use ray_tracing_in_one_weekend::vec3::*;
 
 use rand::Rng;
 
